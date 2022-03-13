@@ -125,6 +125,7 @@ def process_login_page(data: dict = Body(...)):
 def unify_phone_from_json(data: dict = Body(...)):
     phone_number = data["phone"]
     if phone_number:
-        return phone_number_formatation(phone_number)[1:-1]
+        response = Response(phone_number_formatation(phone_number), media_type="text/html")
+        return response
 
 
