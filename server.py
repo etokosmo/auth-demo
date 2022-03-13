@@ -1,4 +1,4 @@
-#FastAPI Server
+# FastAPI Server
 from base64 import b64encode, b64decode
 import binascii
 import hashlib
@@ -8,6 +8,7 @@ from lib2to3.pgen2.token import OP
 from typing import Optional
 from fastapi import FastAPI, Form, Cookie, Body
 from fastapi.responses import Response
+import uvicorn
 
 
 app = FastAPI()
@@ -43,6 +44,21 @@ def verify_password(username: str, password: str) -> bool:
         (password + PASSWORD_SALT).encode()).hexdigest().lower()
     stored_password = users[username]["password"].lower()
     return hash_password == stored_password
+
+
+def correct_phone_number(phone_number):
+    return f"8 ({phone_number[0:3]}) {phone_number[3:6]}-{phone_number[6:8]}-{phone_number[8:]}"
+
+
+def phone_number_formatation(phone):
+    number = ''.join([i for i in phone if i.isdigit()])
+    if (len(number) == 11) and (number[0] == "8" or number[0] == "7") and (number[1] == "9"):
+        number = number[1:]
+        return correct_phone_number(number)
+    elif len(number) == 10 and number[0] == "9":
+        return correct_phone_number(number)
+    else:
+        return number
 
 
 users = {
@@ -103,3 +119,12 @@ def process_login_page(data: dict = Body(...)):
     response.set_cookie(
         key='username', value=username_signed, expires=60*60*24*365)
     return response
+
+
+@app.post("/unify_phone_from_json")
+def unify_phone_from_json(data: dict = Body(...)):
+    phone_number = data["phone"]
+    if phone_number:
+        return phone_number_formatation(phone_number)
+
+
