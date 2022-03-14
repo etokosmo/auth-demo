@@ -123,9 +123,28 @@ def process_login_page(data: dict = Body(...)):
 
 @app.post("/unify_phone_from_json")
 def unify_phone_from_json(data: dict = Body(...)):
-    phone_number = data["phone"]
-    if phone_number:
-        response = Response(phone_number_formatation(phone_number), media_type="text/html")
+    phone = data["phone"]
+    if phone:
+        response = Response(phone_number_formatation(phone), media_type="text/html")
         return response
 
 
+@app.post("/unify_phone_from_form")
+def unify_phone_from_form(phone: str = Form(...)):
+    if phone:
+        response = Response(phone_number_formatation(phone), media_type="text/html")
+        return response
+
+
+@app.get("/unify_phone_from_query")
+def unify_phone_from_query(phone: str = ""):
+    if phone:
+        response = Response(phone_number_formatation(phone), media_type="text/html")
+        return response
+
+
+@app.get("/unify_phone_from_cookies")
+def unify_phone_from_cookies(phone: Optional[str] = Cookie(None)):
+    if phone:
+        response = Response(phone_number_formatation(phone), media_type="text/html")
+        return response
